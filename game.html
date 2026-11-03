@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sudoku Maker | Play</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap">
+<style>
+:root{
+  --bg:#f6f0e8;--sf:#fffdf9;--ink:#16251d;--mu:#5d6d67;--ln:#e8deca;--ac:#e55939;--as:#fbe1d7;--pe:#f5efdf;--er:#c8402d;--ok:#2a8d67;--user:#188060;
+  --shadow:0 18px 42px rgba(22,37,29,.12);--ring:rgba(229,89,57,.18);color-scheme:light
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101d18;--sf:#182a24;--ink:#f4efe8;--mu:#a8b7b0;--ln:#29463d;--ac:#ff8a68;--as:#392a25;--pe:#1f312b;--er:#ff8d7d;--ok:#71d5ab;--user:#7ad8b7;--shadow:0 18px 42px rgba(0,0,0,.28);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101d18;--sf:#182a24;--ink:#f4efe8;--mu:#a8b7b0;--ln:#29463d;--ac:#ff8a68;--as:#392a25;--pe:#1f312b;--er:#ff8d7d;--ok:#71d5ab;--user:#7ad8b7;--shadow:0 18px 42px rgba(0,0,0,.28);color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top left, rgba(229,89,57,.08), transparent 30%), linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, white) 100%);color:var(--ink);font-family:"DM Sans",system-ui,"Segoe UI",sans-serif;line-height:1.5;overflow-x:hidden}
+button,input{font:inherit}
+h1,h2,h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;margin:0;letter-spacing:-.02em}
+.w{max-width:1120px;margin:0 auto;padding:0 24px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--ink);text-decoration:none}
+.logo i{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--ink),color-mix(in srgb, var(--ink) 78%, white));display:grid;place-items:center;color:var(--bg);font:normal 700 15px "DM Serif Display",serif;box-shadow:0 8px 18px rgba(22,37,29,.12)}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.theme-toggle{border:1px solid var(--ln);background:var(--sf);color:var(--ink);padding:10px 12px;border-radius:12px;cursor:pointer;box-shadow:0 10px 22px rgba(22,37,29,.05);transition:transform .15s ease, border-color .15s ease}
+.theme-toggle:hover{transform:translateY(-1px);border-color:var(--ink)}
+.btn{font:inherit;font-weight:700;border:0;border-radius:999px;padding:13px 26px;background:linear-gradient(180deg,#ff9a73 0%, var(--ac) 100%);color:#fff;cursor:pointer;text-decoration:none;display:inline-block;transition:transform .15s ease, box-shadow .15s ease;box-shadow:0 14px 24px rgba(229,89,57,.24)}
+.btn:hover{transform:translateY(-2px)}
+.btn.o{background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:11px 22px;box-shadow:none}
+.btn:focus-visible,.c:focus-visible,.pd:focus-visible,.seg button:focus-visible,.theme-toggle:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+.play{padding:42px 0 92px;background:rgba(255,255,255,.16);border-top:1px solid var(--ln);border-bottom:1px solid var(--ln)}
+.play h2{font-size:clamp(34px,5vw,52px);text-align:center;margin-bottom:10px}
+.play .sub{text-align:center;color:var(--mu);margin:0 0 30px}
+.seg{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:30px}
+.seg button{font:inherit;font-weight:700;border:1.5px solid var(--ln);background:var(--bg);color:var(--ink);padding:9px 20px;border-radius:999px;cursor:pointer;transition:border-color .15s ease, transform .15s ease}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.seg button:hover{transform:translateY(-1px)}
+.app{display:grid;gap:36px;grid-template-columns:minmax(0,520px) 280px;justify-content:center;align-items:start}
+@media(max-width:860px){.app{grid-template-columns:1fr;justify-items:center}.side{width:min(100%,520px)}}
+.bd{display:grid;grid-template-columns:repeat(9,1fr);width:min(100%,520px);aspect-ratio:1;border:3px solid var(--ink);border-radius:16px;overflow:hidden;background:var(--sf);box-shadow:var(--shadow)}
+.c{font:500 clamp(16px,4.6vw,28px) "DM Serif Display",Georgia,serif;border:0;border-right:1px solid var(--ln);border-bottom:1px solid var(--ln);background:var(--sf);color:var(--user);padding:0;cursor:pointer;min-width:0;transition:background .15s ease, color .15s ease, transform .15s ease}
+.c.g{color:var(--ink);font-weight:700}
+.c.cr{border-right:2px solid var(--ink)}.c.cb{border-bottom:2px solid var(--ink)}
+.c.pe{background:var(--pe)}.c.sm{background:var(--as)}.c.sel{background:var(--ac);color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.22)}
+.c.bad{animation:sh .35s;background:var(--er);color:#fff}
+@keyframes sh{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;width:min(100%,520px)}
+.pd{font:inherit;font-size:20px;font-weight:700;padding:11px 0;border-radius:12px;border:1.5px solid var(--ln);background:var(--bg);color:var(--ink);cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease}
+.pd:hover{border-color:var(--ink);transform:translateY(-1px)}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.st div{background:var(--bg);border:1px solid var(--ln);border-radius:14px;padding:10px;text-align:center;box-shadow:0 10px 20px rgba(22,37,29,.04)}
+.st b{display:block;font:400 26px "DM Serif Display",serif}.st span{font-size:12px;color:var(--mu)}
+.msg{min-height:26px;font-weight:700;color:var(--mu);margin-bottom:8px}.msg.e{color:var(--er)}.msg.o{color:var(--ok)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts .btn{text-align:center;padding:12px 10px}
+.acts .full{grid-column:1/-1}
+.res{display:none;margin-top:18px;background:var(--ink);color:var(--bg);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.res.on{display:block}.res h3{font:400 26px "DM Serif Display",serif;margin:0 0 8px}
+.res ul{list-style:none;margin:0 0 16px;padding:0}.res li{padding:3px 0}
+footer{padding:36px 0 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;color:var(--mu);font-size:14px}
+</style>
+</head>
+<body>
+<div class="w">
+<nav>
+  <a class="logo" href="index.html"><i>9</i>Sudoku Maker</a>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+    <a class="btn o" href="index.html">Home</a>
+  </div>
+</nav>
+</div>
+<section class="play" id="play">
+  <div class="w">
+    <h2>Ready when you are</h2>
+    <p class="sub">Choose a level to begin.</p>
+    <div class="seg" id="lv" role="group" aria-label="Difficulty"></div>
+    <div class="app">
+      <div>
+        <div class="bd" id="bd" role="grid" aria-label="Sudoku board"></div>
+        <div class="pad" id="pad"></div>
+      </div>
+      <div class="side">
+        <div class="st">
+          <div><b id="tm">0:00</b><span>Time</span></div>
+          <div><b id="mi">0</b><span>Mistakes</span></div>
+          <div><b id="hi">0</b><span>Hints</span></div>
+        </div>
+        <div class="msg" id="msg" aria-live="polite">Pick a cell, then a number.</div>
+        <div class="acts">
+          <button class="btn full" id="bn">New puzzle</button>
+          <button class="btn o" id="bh">Hint</button>
+          <button class="btn o" id="br">Reset</button>
+          <button class="btn o full" id="bs">Show solution</button>
+        </div>
+        <div class="res" id="res"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="w"><footer><span class="logo" style="font-size:16px"><i>9</i>Sudoku Maker</span><span>© 2026 Sudoku Maker</span></footer></div>
+<script>
+const $=s=>document.querySelector(s);
+const LV={Easy:[45,50,500],Medium:[35,44,700],Hard:[28,34,900],Expert:[22,27,1100]};
+const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function ok(g,i,n){const r=i/9|0,c=i%9;
+ for(let k=0;k<9;k++){if(k!==c&&g[r*9+k]===n)return false;if(k!==r&&g[k*9+c]===n)return false}
+ const br=r-r%3,bc=c-c%3;
+ for(let a=0;a<3;a++)for(let b=0;b<3;b++){const j=(br+a)*9+bc+b;if(j!==i&&g[j]===n)return false}
+ return true}
+function fill(g){const i=g.indexOf(0);if(i<0)return true;
+ for(const n of sh([1,2,3,4,5,6,7,8,9]))if(ok(g,i,n)){g[i]=n;if(fill(g))return true;g[i]=0}
+ return false}
+function count(g,lim){let best=-1,bc=10,bl=null;
+ for(let i=0;i<81;i++)if(!g[i]){const l=[];for(let n=1;n<10;n++)if(ok(g,i,n))l.push(n);
+  if(l.length<bc){bc=l.length;best=i;bl=l;if(bc===0)return 0;if(bc===1)break}}
+ if(best<0)return 1;let t=0;
+ for(const n of bl){g[best]=n;t+=count(g,lim-t);g[best]=0;if(t>=lim)break}
+ return t}
+function makeSolution(){const g=Array(81).fill(0);
+ for(const s of [0,30,60]){const d=sh([1,2,3,4,5,6,7,8,9]);let k=0;
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++)g[s+r*9+c]=d[k++]}
+ fill(g);return g}
+function makePuzzle(sol,lv){const [lo,hi]=LV[lv],target=lo+(Math.random()*(hi-lo+1)|0);
+ const p=sol.slice();let clues=81;
+ for(const i of sh([...Array(81).keys()])){if(clues<=target)break;
+  const v=p[i];p[i]=0;if(count(p.slice(),2)!==1)p[i]=v;else clues--}
+ return {p,clues}}
+
+let level="Medium",sol,giv,cur,sel=null,mist=0,hints=0,t0=0,timer=null,over=false;
+const cells=[],bd=$("#bd");
+for(let i=0;i<81;i++){const b=document.createElement("button");b.className="c"+(i%9%3===2&&i%9<8?" cr":"")+((i/9|0)%3===2&&(i/9|0)<8?" cb":"");
+ b.setAttribute("role","gridcell");b.setAttribute("aria-label","Row "+((i/9|0)+1)+", column "+(i%9+1));
+ b.onclick=()=>{sel=i;paint()};bd.appendChild(b);cells.push(b)}
+const pad=$("#pad");
+for(let n=1;n<=9;n++){const b=document.createElement("button");b.className="pd";b.textContent=n;b.onclick=()=>enter(n);pad.appendChild(b)}
+{const b=document.createElement("button");b.className="pd";b.textContent="⌫";b.setAttribute("aria-label","Erase");b.onclick=()=>enter(0);pad.appendChild(b)}
+const lvBox=$("#lv");
+Object.keys(LV).forEach(k=>{const b=document.createElement("button");b.textContent=k;b.setAttribute("aria-pressed",k===level);
+ b.onclick=()=>{level=k;lvBox.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));newGame()};lvBox.appendChild(b)});
+
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const toggle = document.getElementById('themeToggle');
+  toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+setTheme(preferredTheme);
+$('#themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  setTheme(current);
+});
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+function paint(){const sr=sel===null?-1:sel/9|0,sc=sel===null?-1:sel%9,sv=sel!==null?cur[sel]:0;
+ cells.forEach((b,i)=>{const r=i/9|0,c=i%9;b.textContent=cur[i]||"";
+  let k=b.className.replace(/ ?(g|pe|sm|sel)\b/g,"");
+  if(giv[i])k+=" g";
+  if(sel!==null){if(i===sel)k+=" sel";else if(sv&&cur[i]===sv)k+=" sm";
+   else if(r===sr||c===sc||((r/3|0)===(sr/3|0)&&(c/3|0)===(sc/3|0)))k+=" pe"}
+  b.className=k});
+ $("#mi").textContent=mist;$("#hi").textContent=hints}
+function tick(){const s=Math.floor((Date.now()-t0)/1000);$("#tm").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function flash(i){const b=cells[i];b.classList.add("bad");setTimeout(()=>b.classList.remove("bad"),400)}
+function enter(n){if(over||sel===null||giv[sel])return;
+ if(n===0){cur[sel]=0;paint();return}
+ if(cur[sel]===n)return;
+ if(!ok(cur,sel,n)){mist++;msg(n+" already appears in that row, column or box.","e");flash(sel);paint();return}
+ if(n!==sol[sel]){mist++;msg("That fits the rules but not this puzzle’s solution.","e");flash(sel);paint();return}
+ cur[sel]=n;msg("Nice move.","o");paint();
+ if(cur.every((v,i)=>v===sol[i]))finish(true)}
+function hint(){if(over)return;
+ let i=sel!==null&&!giv[sel]&&cur[sel]!==sol[sel]?sel:-1;
+ if(i<0){const e=[];cur.forEach((v,k)=>{if(v!==sol[k])e.push(k)});if(!e.length)return;i=e[Math.random()*e.length|0]}
+ sel=i;cur[i]=sol[i];hints++;msg("Hint used.","o");paint();
+ if(cur.every((v,k)=>v===sol[k]))finish(true)}
+function finish(user){over=true;clearInterval(timer);
+ const s=Math.floor((Date.now()-t0)/1000),sc=Math.max(0,LV[level][2]-Math.round(s/2)-10*mist-15*hints);
+ const r=$("#res");r.className="res on";
+ r.innerHTML=user?`<h3>Puzzle complete!</h3><ul><li>Time: ${$("#tm").textContent}</li><li>Mistakes: ${mist}</li><li>Hints used: ${hints}</li><li><b>Score: ${sc}</b></li></ul><button class="btn" id="pa">Play again</button>`:`<h3>Solution shown</h3><ul><li>Ready for a new puzzle?</li></ul><button class="btn" id="pa">Play again</button>`;
+ $("#pa").onclick=newGame;msg(user?"Well done!":"Solution shown.","o")}
+function solve(){if(over||!sol)return;cur=sol.slice();paint();finish(false)}
+function reset(){cur=giv.slice();sel=null;mist=0;hints=0;over=false;$("#res").className="res";t0=Date.now();clearInterval(timer);timer=setInterval(tick,1000);tick();msg("Pick a cell, then a number.");paint()}
+function newGame(){msg("Creating your puzzle…");cells.forEach(b=>b.disabled=true);
+ setTimeout(()=>{sol=makeSolution();giv=makePuzzle(sol,level).p;cells.forEach(b=>b.disabled=false);reset()},30)}
+$("#bn").onclick=newGame;$("#bh").onclick=hint;$("#bs").onclick=solve;$("#br").onclick=()=>{if(giv)reset()};
+document.addEventListener("keydown",e=>{
+ if(e.key>="1"&&e.key<="9")enter(+e.key);
+ else if(e.key==="Backspace"||e.key==="Delete"||e.key==="0")enter(0);
+ else if(e.key.startsWith("Arrow")&&sel!==null){e.preventDefault();
+  const d={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[e.key],n=sel+d;
+  if(n>=0&&n<81&&!(d===1&&sel%9===8)&&!(d===-1&&sel%9===0)){sel=n;paint()}}});
+newGame();
+</script>
+</body>
+</html>
