@@ -9,6 +9,8 @@ A lightweight browser-based Sudoku game built with plain HTML, CSS, and JavaScri
 - Responsive layout with a clean gameboard UI
 - Dark mode support
 
+The landing page displays a shared, cumulative page-view count using VisitorBadge.io. It counts page loads, not unique people, and requires an internet connection.
+
 ## Run locally
 Open `index.html` directly in a browser, or serve the folder with a simple local web server:
 
